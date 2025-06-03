@@ -62,6 +62,8 @@ core:
         channel: 8.0/beta
         storage:
           database: 4G
+      mysql-router-k8s:
+        channel: 8.0/candidate
       cinder-volume:
         channel: 2024.1/edge
       cinder-volume-ceph:
