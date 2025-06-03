@@ -1,0 +1,67 @@
+data "lxd_network" "main_bridge" {
+  name = "lxdbr0"
+}
+
+locals {
+  restricted_net                = "192.167.98.0/24"
+  restricted_domain             = "res"
+  restricted_allowed_dhcp_range = [2, 229]
+  compute_net                   = "10.20.30.0/24"
+}
+
+resource "lxd_network" "restricted" {
+  name = "restrictedbr0"
+
+  # lxc network set restrictedbr0 raw.dnsmasq="host-record=ns.sunbeam.res,192.167.98.234"
+  config = {
+    "ipv4.address" = "${cidrhost(local.restricted_net, 1)}/24"
+    "ipv4.nat"     = "false"
+    "ipv4.dhcp"    = "true"
+    "ipv4.dhcp.ranges" : "${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[0])}-${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[1])}"
+    "ipv6.address"  = "none"
+    "ipv6.dhcp"     = "false"
+    "dns.domain"    = local.restricted_domain
+    "dns.mode"      = "managed"
+    "security.acls" = lxd_network_acl.restricted.name
+  }
+}
+
+resource "lxd_network" "compute" {
+  name = "computebr0"
+
+  config = {
+    "ipv4.address" = "${cidrhost(local.compute_net, 1)}/24"
+    "ipv4.nat"     = "true"
+    "ipv4.dhcp"    = "false"
+    "ipv6.address" = "none"
+  }
+}
+
+resource "lxd_network_acl" "restricted" {
+  name = "restricted"
+
+  egress = [
+    {
+      description = "Allow communication to local network"
+      action      = "allow"
+      destination = local.restricted_net
+      state       = "enabled"
+    },
+    {
+      description = "Prevent external communication"
+      action      = "reject"
+      destination = "0.0.0.0"
+      state       = "enabled"
+    },
+  ]
+
+  ingress = [
+    {
+      description = "Allow communication from local network"
+      action      = "allow"
+      destination = local.restricted_net
+      state       = "enabled"
+    },
+  ]
+
+}

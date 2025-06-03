@@ -1,0 +1,164 @@
+core:
+  config:
+    proxy:
+      # Configure proxy for access to external network resources?
+      proxy_required: True
+      # Enter value for http_proxy:
+      http_proxy: ${proxy_url}
+      # Enter value for https_proxy:
+      https_proxy: ${proxy_url}
+      # Enter value for no_proxy:
+      no_proxy: ${no_proxy}
+    region: LizardTwo
+    database: single
+    bootstrap:
+      # Management CIDRs shared by the hosts (separated by comma)
+      management_cidr: ${restricted_network}
+    k8s-addons:
+      loadbalancer: ${loadbalancer}
+    user:
+      # Populate OpenStack cloud with demo user, default images, flavors etc
+      run_demo_setup: True
+      # Username to use for access to OpenStack
+      username: gtestos
+      # Password to use for access to OpenStack
+      password: demo
+      # Network range to use for project network
+      cidr: 192.168.122.0/24
+      # List of nameservers guests should use for DNS resolution
+      nameservers: ${nameservers}
+      # Enable ping and SSH access to instances?
+      security_group_rules: True
+      # Local or remote access to VMs
+      remote_access_location: remote
+    external_network:
+      # CIDR of network to use for external networking
+      cidr: ${compute_network}
+      # IP address of default gateway for external network
+      gateway: ${compute_gateway}
+      # Start of IP allocation range for external network
+      range: ${compute_range}
+      # Network type for access to external network
+      network_type: flat
+      # VLAN ID to use for external network
+      # segmentation_id:
+      # Free network interface that will be configured for external traffic
+      nic: enp6s0
+    # MicroCeph config
+    microceph_config:
+%{ for hostname, osd_list in osds}
+      ${hostname}:
+        osd_devices: ${osd_list}
+%{ endfor }
+  software:
+    juju:
+      bootstrap_args:
+        - --bootstrap-constraints
+        - root-disk=5G
+        - --config
+        - caas-image-repo=ghcr.io/juju
+    charms:
+      mysql-k8s:
+        channel: 8.0/beta
+        storage:
+          database: 4G
+      cinder-volume:
+        channel: 2024.1/edge
+      cinder-volume-ceph:
+        channel: 2024.1/edge
+      cinder-k8s:
+        channel: 2024.1/edge
+      glance-k8s:
+        channel: 2024.1/edge
+      horizon-k8s:
+        channel: 2024.1/edge
+      keystone-k8s:
+        channel: 2024.1/edge
+      neutron-k8s:
+        channel: 2024.1/edge
+      nova-k8s:
+        channel: 2024.1/edge
+      openstack-hypervisor:
+        channel: 2024.1/edge
+        config:
+          snap-channel: 2024.1/edge
+      ovn-central-k8s:
+        channel: 24.03/edge
+      ovn-relay-k8s:
+        channel: 24.03/edge
+      placement-k8s:
+        channel: 2024.1/edge
+      sunbeam-clusterd:
+        channel: 2024.1/edge
+        config:
+          snap-channel: 2024.1/edge
+      sunbeam-machine:
+        channel: 2024.1/edge
+      microceph:
+        channel: latest/edge
+        config:
+          snap-channel: squid/edge
+features:
+  caas:
+    software:
+      charms:
+        magnum-k8s:
+          channel: 2024.1/edge
+  dns:
+    software:
+      charms:
+        designate-bind-k8s:
+          channel: 9/edge
+        designate-k8s:
+          channel: 2024.1/edge
+  images-sync:
+    software:
+      charms:
+        openstack-images-sync-k8s:
+          channel: 2024.1/edge
+  ldap:
+    software:
+      charms:
+        keystone-ldap-k8s:
+          channel: 2024.1/edge
+  loadbalancer:
+    software:
+      charms:
+        octavia-k8s:
+          channel: 2024.1/edge
+  orchestration:
+    software:
+      charms:
+        heat-k8s:
+          channel: 2024.1/edge
+  secrets:
+    software:
+      charms:
+        barbican-k8s:
+          channel: 2024.1/edge
+  telemetry:
+    software:
+      charms:
+        aodh-k8s:
+          channel: 2024.1/edge
+        ceilometer-k8s:
+          channel: 2024.1/edge
+        gnocchi-k8s:
+          channel: 2024.1/edge
+        openstack-exporter-k8s:
+          channel: 2024.1/edge
+  validation:
+    software:
+      charms:
+        tempest-k8s:
+          channel: 2024.1/edge
+  resource-optimization:
+    software:
+      charms:
+        watcher-k8s:
+          channel: 2024.1/edge
+  instance-recovery:
+    software:
+      charms:
+        masakari-k8s:
+          channel: 2024.1/edge

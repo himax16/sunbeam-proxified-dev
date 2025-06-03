@@ -1,0 +1,9 @@
+#cloud-config
+hostname: squid
+fqdn: squid.lxd
+prefer_fqdn_over_hostname: true
+package_update: true
+package_upgrade: true
+packages:
+  - squid
+locale: C.UTF-8

@@ -1,0 +1,5 @@
+#!/usr/sbin/nft -f
+
+add table nat
+add chain nat postrouting { type nat hook postrouting priority 100 \; }
+add rule nat postrouting ip saddr ${restricted_network} oif enp5s0 snat ${main_bridge_ip}

@@ -1,0 +1,10 @@
+version: 2
+ethernets:
+  eth0:
+    match: { name: enp5s0 }
+    dhcp4: true
+  eth1:
+    match: { name: enp6s0 }
+    dhcp4: true
+    dhcp4-overrides:
+        use-routes: false
