@@ -11,7 +11,7 @@ module "compute" {
   count      = var.nb_vm
 
   cores  = count.index == 0 ? "6" : "4"
-  memory = count.index == 0 ? "16GiB" : "6GiB"
+  memory = count.index == 0 ? "20GiB" : "10GiB"
 
   hostname          = "bm${count.index}"
   management_domain = local.restricted_domain

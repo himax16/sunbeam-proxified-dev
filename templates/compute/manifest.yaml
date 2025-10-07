@@ -45,6 +45,16 @@ core:
       # Free network interface that will be configured for external traffic
       nic: enp6s0
     # MicroCeph config
+    endpoints:
+      ingress-internal:
+        ip: 192.167.98.234
+        hostname: internal.sunbeam.res
+      ingress-public:
+        ip: 192.167.98.233
+        hostname: public.sunbeam.res
+      ingress-rgw:
+        ip: 192.167.98.235
+        hostname: s3.sunbeam.res
     microceph_config:
 %{ for hostname, osd_list in osds}
       ${hostname}:
