@@ -76,6 +76,8 @@ core:
         channel: 8.0/candidate
       cinder-volume:
         channel: 2024.1/edge
+        config:
+          snap-channel: 2024.1/edge
       cinder-volume-ceph:
         channel: 2024.1/edge
       cinder-k8s:

@@ -72,13 +72,15 @@ resource "lxd_instance" "compute" {
     }
   }
 
-  device {
-    name = "eth1"
-    type = "nic"
-
-    properties = {
-      name    = "eth1"
-      network = var.compute_net
+  dynamic "device" {
+    for_each = var.compute_nets
+    content {
+      name = "eth${index(var.compute_nets, device.value) + 1}"
+      type = "nic"
+      properties = {
+        name    = "eth${index(var.compute_nets, device.value) + 1}"
+        network = device.value
+      }
     }
   }
 

@@ -15,3 +15,9 @@ ethernets:
   eth1:
     match: { name: enp6* }
     dhcp4: false
+  eth2:
+    match: { name: enp7* }
+    dhcp4: false
+  eth3:
+    match: { name: enp8* }
+    dhcp4: false

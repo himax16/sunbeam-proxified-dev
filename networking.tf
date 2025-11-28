@@ -6,7 +6,10 @@ locals {
   restricted_net                = "192.167.98.0/24"
   restricted_domain             = "res"
   restricted_allowed_dhcp_range = [2, 229]
-  compute_net                   = "10.20.30.0/24"
+  nb_compute_networks           = 3
+  compute_nets = [
+    for i in range(local.nb_compute_networks) : "10.20.${30 + i * 10}.0/24"
+  ]
 }
 
 resource "lxd_network" "restricted" {
@@ -18,12 +21,12 @@ resource "lxd_network" "restricted" {
     "ipv4.nat"     = "true"
     "ipv4.dhcp"    = "true"
     "ipv4.dhcp.ranges" : "${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[0])}-${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[1])}"
-    "ipv6.address"  = "none"
-    "ipv6.dhcp"     = "false"
-    "dns.domain"    = local.restricted_domain
-    "dns.mode"      = "managed"
+    "ipv6.address" = "none"
+    "ipv6.dhcp"    = "false"
+    "dns.domain"   = local.restricted_domain
+    "dns.mode"     = "managed"
     # "security.acls" = lxd_network_acl.restricted.name
-    "raw.dnsmasq"  = <<-EOT
+    "raw.dnsmasq" = <<-EOT
       host-record=public.sunbeam.${local.restricted_domain},${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[1] + 4)}
       host-record=internal.sunbeam.${local.restricted_domain},${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[1] + 5)}
       host-record=s3.sunbeam.${local.restricted_domain},${cidrhost(local.restricted_net, local.restricted_allowed_dhcp_range[1] + 6)}
@@ -31,16 +34,18 @@ resource "lxd_network" "restricted" {
   }
 }
 
-resource "lxd_network" "compute" {
-  name = "computebr0"
+resource "lxd_network" "computes" {
+  count = local.nb_compute_networks
+  name  = "computebr${count.index + 1}0"
 
   config = {
-    "ipv4.address" = "${cidrhost(local.compute_net, 1)}/24"
+    "ipv4.address" = "${cidrhost(local.compute_nets[count.index], 1)}/24"
     "ipv4.nat"     = "true"
     "ipv4.dhcp"    = "false"
     "ipv6.address" = "none"
   }
 }
+
 
 resource "lxd_network_acl" "restricted" {
   name = "restricted"
@@ -68,5 +73,4 @@ resource "lxd_network_acl" "restricted" {
       state       = "enabled"
     },
   ]
-
 }
