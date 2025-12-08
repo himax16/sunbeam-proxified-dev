@@ -1,0 +1,34 @@
+#cloud-config
+hostname: ${hostname}
+fqdn: ${fqdn}
+prefer_fqdn_over_hostname: false
+byobu_by_default: enable-system
+packages:
+  - openssh-server
+  - snapd
+  - jq
+locale: C.UTF-8
+users:
+  - name: ubuntu
+    lock_passwd: true
+    shell: /bin/bash
+    groups: [sudo]
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_import_id:
+      - lp:gboutry
+write_files:
+  - path: /etc/apt/apt.conf.d/00-proxy
+    permissions: "0640"
+    owner: root
+    content: |
+      Acquire::http { Proxy "${proxy_url}"; };
+      Acquire::https { Proxy "${proxy_url}"; };
+      Acquire::http::Pipeline-Depth "23";
+      Acquire::Languages "none";
+  - content: |
+      HTTP_PROXY="${proxy_url}"
+      HTTPS_PROXY="${proxy_url}"
+      NO_PROXY="${no_proxy}"
+    path: /etc/environment
+    owner: root:root
+    permissions: "0o555"

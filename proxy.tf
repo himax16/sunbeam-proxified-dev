@@ -1,7 +1,7 @@
 locals {
-  proxy_url      = "http://${lxd_instance.proxy.name}.${lxd_network.restricted.config["dns.domain"]}:3128"
+  proxy_url      = var.use_proxy ? "http://${lxd_instance.proxy[0].name}.${lxd_network.restricted.config["dns.domain"]}:3128" : ""
   main_bridge_ip = cidrhost(data.lxd_network.main_bridge.config["ipv4.address"], 2)
-  proxy_ip       = cidrhost(lxd_network.restricted.config["ipv4.address"], 2)
+  proxy_ip       = var.use_proxy ? cidrhost(lxd_network.restricted.config["ipv4.address"], 2) : ""
 }
 
 data "cloudinit_config" "cloudinit-proxy" {
@@ -19,6 +19,7 @@ data "cloudinit_config" "cloudinit-proxy" {
 }
 
 resource "lxd_instance" "proxy" {
+  count = var.use_proxy ? 1 : 0
   name  = "squid"
   image = "ubuntu:noble"
 
@@ -60,7 +61,8 @@ resource "lxd_instance" "proxy" {
 }
 
 resource "lxd_instance_file" "allowed_domains" {
-  instance    = lxd_instance.proxy.name
+  count       = var.use_proxy ? 1 : 0
+  instance    = lxd_instance.proxy[0].name
   content     = file("${path.root}/templates/proxy/allowed_domains.txt")
   target_path = "/etc/squid/allowed_domains.txt"
   mode        = "0644"
@@ -70,8 +72,9 @@ resource "lxd_instance_file" "allowed_domains" {
 }
 
 resource "lxd_instance_file" "squid_conf_block" {
+  count      = var.use_proxy ? 1 : 0
   depends_on = [lxd_instance_file.allowed_domains]
-  instance   = lxd_instance.proxy.name
+  instance   = lxd_instance.proxy[0].name
   content = templatefile("${path.root}/templates/proxy/squid.conf", {
     localnet = local.restricted_net
   })
@@ -81,7 +84,7 @@ resource "lxd_instance_file" "squid_conf_block" {
   gid         = 0
 
   provisioner "local-exec" {
-    command     = "lxc exec ${lxd_instance.proxy.name} -- squid -k reconfigure"
+    command     = "lxc exec ${lxd_instance.proxy[0].name} -- squid -k reconfigure"
     interpreter = ["bash", "-c"]
   }
 
@@ -94,5 +97,6 @@ resource "lxd_instance_file" "squid_conf_block" {
 }
 
 resource "null_resource" "proxy" {
+  count      = var.use_proxy ? 1 : 0
   depends_on = [lxd_instance.proxy, lxd_instance_file.squid_conf_block, lxd_instance_file.allowed_domains]
 }

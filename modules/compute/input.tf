@@ -8,6 +8,9 @@ variable "proxy_ip" {}
 variable "no_proxy" {}
 variable "cores" {}
 variable "memory" {}
+variable "use_proxy" {
+  type = bool
+}
 variable "nb_osd" {
   default = 3
 }

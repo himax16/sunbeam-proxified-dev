@@ -3,6 +3,12 @@ ethernets:
   eth0:
     match: { name: enp5* }
     dhcp4: true
+    dhcp4-overrides:
+        use-routes: false
+    routes:
+      - to: default
+        via: ${proxy_ip}
+        on-link: true
     nameservers:
       addresses: ${nameservers}
       search: ${search_domains}

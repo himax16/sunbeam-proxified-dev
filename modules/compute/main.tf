@@ -33,20 +33,24 @@ data "cloudinit_config" "cloudinit-compute" {
   part {
     content_type = "text/cloud-config"
 
-    content = templatefile("${path.module}/templates/cloudinit.yaml", {
+    content = var.use_proxy ? templatefile("${path.module}/templates/cloudinit-proxy.yaml", {
       hostname          = var.hostname,
       fqdn              = local.fqdn,
       proxy_url         = var.proxy_url,
       no_proxy          = var.no_proxy,
+      management_domain = var.management_domain,
+      }) : templatefile("${path.module}/templates/cloudinit.yaml", {
+      hostname          = var.hostname,
+      fqdn              = local.fqdn,
       management_domain = var.management_domain,
     })
   }
 }
 
 resource "lxd_instance" "compute" {
-  name       = var.hostname
-  image      = "ubuntu:noble"
-  type       = "virtual-machine"
+  name  = var.hostname
+  image = "ubuntu:noble"
+  type  = "virtual-machine"
 
   limits = {
     cpu    = var.cores
@@ -56,8 +60,11 @@ resource "lxd_instance" "compute" {
   config = {
     "user.access_interface" = "enp5s0"
     "user.user-data"        = data.cloudinit_config.cloudinit-compute.rendered
-    "user.network-config" = templatefile("${path.module}/templates/network.yaml", {
+    "user.network-config" = var.use_proxy ? templatefile("${path.module}/templates/network-proxy.yaml", {
       proxy_ip       = var.proxy_ip
+      nameservers    = jsonencode([var.management_dns])
+      search_domains = jsonencode([var.management_domain])
+      }) : templatefile("${path.module}/templates/network.yaml", {
       nameservers    = jsonencode([var.management_dns])
       search_domains = jsonencode([var.management_domain])
     })

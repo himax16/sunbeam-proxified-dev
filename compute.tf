@@ -21,6 +21,7 @@ module "compute" {
   proxy_url         = local.proxy_url
   proxy_ip          = local.proxy_ip
   no_proxy          = local.no_proxy
+  use_proxy         = var.use_proxy
 }
 
 resource "lxd_instance_file" "manifest" {
