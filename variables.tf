@@ -5,5 +5,5 @@ variable "nb_vm" {
 variable "use_proxy" {
   description = "Whether to deploy a squid proxy and route traffic through it"
   type        = bool
-  default     = true
+  default     = false
 }
