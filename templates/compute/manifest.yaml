@@ -2,7 +2,7 @@ core:
   config:
     proxy:
       # Configure proxy for access to external network resources?
-      proxy_required: True
+      proxy_required: ${use_proxy}
       # Enter value for http_proxy:
       http_proxy: ${proxy_url}
       # Enter value for https_proxy:

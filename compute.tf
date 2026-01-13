@@ -28,6 +28,7 @@ resource "lxd_instance_file" "manifest" {
   depends_on = [module.compute]
   instance   = module.compute[0].name
   content = templatefile("${path.root}/templates/compute/manifest.yaml", {
+    use_proxy          = var.use_proxy,
     proxy_url          = local.proxy_url,
     no_proxy           = local.no_proxy,
     restricted_network = local.restricted_net,
