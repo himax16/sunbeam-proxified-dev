@@ -1,5 +1,7 @@
 variable "nb_vm" {
-  default = 1
+  description = "Number of VMs to deploy"
+  type        = number
+  default     = 3
 }
 
 variable "use_proxy" {
