@@ -14,3 +14,6 @@ variable "use_proxy" {
 variable "nb_osd" {
   default = 3
 }
+variable "ssh_import_id" {
+  type = list(string)
+}

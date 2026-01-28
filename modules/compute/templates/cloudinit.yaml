@@ -14,5 +14,9 @@ users:
     shell: /bin/bash
     groups: [sudo]
     sudo: ALL=(ALL) NOPASSWD:ALL
+  %{ if length(ssh_import_id) > 0 }
     ssh_import_id:
-      - lp:gboutry
+  %{ for id in ssh_import_id ~}
+      - ${id}
+  %{ endfor ~}
+  %{ endif }

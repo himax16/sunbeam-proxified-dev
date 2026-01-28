@@ -9,3 +9,9 @@ variable "use_proxy" {
   type        = bool
   default     = false
 }
+
+variable "ssh_import_id" {
+  description = "List of ssh-import-id entries for cloud-init users"
+  type        = list(string)
+  default     = ["lp:himax16", "gh:himax16"]
+}

@@ -22,6 +22,7 @@ module "compute" {
   proxy_ip          = local.proxy_ip
   no_proxy          = local.no_proxy
   use_proxy         = var.use_proxy
+  ssh_import_id     = var.ssh_import_id
 }
 
 resource "lxd_instance_file" "manifest" {
