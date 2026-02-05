@@ -5,13 +5,29 @@ locals {
   nameserver   = cidrhost(local.restricted_net, 1)
 }
 
+# Check total requested memory during plan phase
+data "external" "memory_check" {
+  program = ["bash", "${path.root}/scripts/check_mem.sh"]
+  query = {
+    memory_main  = var.memory_main
+    memory_child = var.memory_child
+    nb_vm        = var.nb_vm
+  }
+}
+resource "null_resource" "memory_check" {
+  triggers = {
+    requested_kib = data.external.memory_check.result.requested_kib
+    available_kib = data.external.memory_check.result.available_kib
+  }
+}
+
 module "compute" {
   depends_on = [null_resource.proxy]
   source     = "./modules/compute"
   count      = var.nb_vm
 
-  cores  = count.index == 0 ? "6" : "4"
-  memory = count.index == 0 ? "20GiB" : "10GiB"
+  cores  = count.index == 0 ? var.ncore_main : var.ncore_child
+  memory = count.index == 0 ? var.memory_main : var.memory_child
 
   hostname          = "bm${count.index}"
   management_domain = local.restricted_domain
