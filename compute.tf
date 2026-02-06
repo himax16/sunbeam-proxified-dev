@@ -21,6 +21,23 @@ resource "null_resource" "memory_check" {
   }
 }
 
+# Check total requested CPUs during plan phase
+data "external" "cpu_check" {
+  program = ["bash", "${path.root}/scripts/check_cpu.sh"]
+  query = {
+    ncore_main  = var.ncore_main
+    ncore_child = var.ncore_child
+    nb_vm       = var.nb_vm
+  }
+}
+resource "null_resource" "cpu_check" {
+  triggers = {
+    requested_cpus = data.external.cpu_check.result.requested_cpus
+    available_cpus = data.external.cpu_check.result.available_cpus
+    cpu_warning    = lookup(data.external.cpu_check.result, "warning", "")
+  }
+}
+
 module "compute" {
   depends_on = [null_resource.proxy]
   source     = "./modules/compute"

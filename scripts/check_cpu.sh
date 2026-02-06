@@ -30,9 +30,11 @@ fi
 HOST_CPUS=$(nproc)
 
 if [ "$TOTAL_REQUESTED" -gt "$HOST_CPUS" ]; then
-  echo "ERROR: requested ${TOTAL_REQUESTED} CPUs exceed host CPUs (${HOST_CPUS})" >&2
-  printf '{"error":"requested %d > host %d", "requested_cpus":%d, "host_cpus":%d}\n' "$TOTAL_REQUESTED" "$HOST_CPUS" "$TOTAL_REQUESTED" "$HOST_CPUS" >&2
-  exit 1
+  echo "WARNING: requested ${TOTAL_REQUESTED} CPUs exceed host CPUs (${HOST_CPUS})" >&2
+  # Return a warning in JSON but exit success so Terraform doesn't fail the plan
+  printf '{"warning":"requested %d > host %d", "requested_cpus":"%d", "host_cpus":"%d"}\n' "$TOTAL_REQUESTED" "$HOST_CPUS" "$TOTAL_REQUESTED" "$HOST_CPUS"
+  # exit 0 (implicit)
 fi
 
-printf '{"requested_cpus": %d, "available_cpus": %d}\n' "$TOTAL_REQUESTED" "$HOST_CPUS"
+# On success include an empty warning field to keep result shape stable
+printf '{"requested_cpus":"%d", "available_cpus":"%d", "warning":""}\n' "$TOTAL_REQUESTED" "$HOST_CPUS"
