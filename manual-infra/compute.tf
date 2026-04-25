@@ -153,6 +153,7 @@ resource "local_file" "manifest_yaml" {
     nameservers        = local.nameserver
     external_networks  = local.external_networks
     osds               = { for compute in module.manual_compute : compute.fqdn => join(",", formatlist("/dev/disk/by-id/scsi-SQEMU_QEMU_HARDDISK_lxd_%s", compute.osds)) }
+    wipe_disks         = var.wipe_disks
   })
   filename = "${path.root}/manifest.yaml"
 }

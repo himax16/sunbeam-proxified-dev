@@ -68,6 +68,7 @@ core:
 %{ for hostname, osd_list in osds}
       ${hostname}:
         osd_devices: ${osd_list}
+        dangerous_i_acknowledge_i_will_lose_data_wipe_disks: ${wipe_disks}
 %{ endfor }
   software:
     juju:

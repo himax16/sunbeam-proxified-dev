@@ -37,6 +37,12 @@ variable "vm_config" {
   }
 }
 
+variable "wipe_disks" {
+  description = "Whether to wipe disks before using them for MicroCeph"
+  type        = bool
+  default     = true
+}
+
 variable "vm_config_override" {
   description = "Override configuration for specific VMs (merged with vm_config defaults)"
   type = map(object({
