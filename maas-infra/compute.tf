@@ -39,4 +39,6 @@ module "maas_compute" {
   osd_disk_size          = try(var.vm_config_override["vm${count.index}"].osd_disk_size, var.vm_config.osd_disk_size)
   roles                  = try(var.vm_config_override["vm${count.index}"].roles, var.vm_config.roles)
   isolation_cidrs        = local.vm_isolation_cidrs[count.index]
+
+  vm_boot_timeout = var.vm_boot_timeout
 }

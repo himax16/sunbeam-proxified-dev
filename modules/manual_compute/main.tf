@@ -59,6 +59,11 @@ resource "lxd_instance" "compute" {
     memory = var.memory
   }
 
+  timeouts = {
+    create = var.vm_boot_timeout
+    update = var.vm_boot_timeout
+  }
+
   config = {
     "user.access_interface" = "enp5s0"
     "user.user-data"        = data.cloudinit_config.cloudinit-compute.rendered

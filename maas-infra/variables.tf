@@ -98,3 +98,9 @@ variable "maas_network_cidrs" {
     storage_cluster = "10.25.50.0/24"
   }
 }
+
+variable "vm_boot_timeout" {
+  description = "How long Terraform waits for MAAS VMs to compose and boot"
+  type        = string
+  default     = "5m"
+}

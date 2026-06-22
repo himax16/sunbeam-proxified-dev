@@ -35,3 +35,9 @@ variable "isolation_cidrs" {
   type        = list(string)
   default     = []
 }
+
+variable "vm_boot_timeout" {
+  description = "How long Terraform waits for the MAAS VM to compose and boot"
+  type        = string
+  default     = "15m"
+}

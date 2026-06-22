@@ -30,3 +30,9 @@ variable "ssh_public_key" {
   description = "SSH public key to authorize for the ubuntu user"
   type        = string
 }
+
+variable "vm_boot_timeout" {
+  description = "How long Terraform waits for the LXD VM to reach Running state"
+  type        = string
+  default     = "15m"
+}

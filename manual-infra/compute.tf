@@ -140,6 +140,7 @@ module "manual_compute" {
   no_proxy           = local.no_proxy
   use_proxy          = var.use_proxy
   ssh_public_key     = trimspace(tls_private_key.global.public_key_openssh)
+  vm_boot_timeout    = var.vm_boot_timeout
 }
 
 resource "local_file" "manifest_yaml" {

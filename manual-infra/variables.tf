@@ -57,3 +57,9 @@ variable "vm_config_override" {
   }))
   default = {}
 }
+
+variable "vm_boot_timeout" {
+  description = "How long Terraform waits for LXD VMs to reach Running state"
+  type        = string
+  default     = "15m"
+}

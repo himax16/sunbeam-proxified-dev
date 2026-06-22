@@ -20,6 +20,10 @@ resource "maas_vm_host_machine" "compute" {
   cores    = tonumber(var.cores)
   memory   = local.memory_mb
 
+  timeouts {
+    create = var.vm_boot_timeout
+  }
+
   storage_disks { size_gigabytes = local.root_disk_gb }
 
   dynamic "storage_disks" {
