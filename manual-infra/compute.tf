@@ -66,14 +66,11 @@ resource "lxd_instance" "dns" {
   name  = "dns"
   image = "ubuntu:noble"
 
-  limits = {
-    cpu    = "1"
-    memory = "1GiB"
-  }
-
   config = {
     "user.access_interface" = "eth0"
     "user.user-data"        = data.cloudinit_config.cloudinit-dns.rendered
+    "limits.cpu"            = "1"
+    "limits.memory"         = "1GiB"
   }
 
   device {

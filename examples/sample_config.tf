@@ -15,7 +15,10 @@ terraform {
 }
 
 provider "lxd" {
-  generate_client_certificates = true
+  remote {
+    name    = "local"
+    address = "unix://"
+  }
 }
 
 # Example configuration with 3 VMs

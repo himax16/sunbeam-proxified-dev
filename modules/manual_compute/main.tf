@@ -2,7 +2,7 @@ terraform {
   required_providers {
     lxd = {
       source  = "terraform-lxd/lxd"
-      version = ">=2.5.0"
+      version = ">=3.0.0"
     }
     cloudinit = {
       source  = "hashicorp/cloudinit"
@@ -11,7 +11,7 @@ terraform {
   }
 }
 
-resource "lxd_volume" "osd" {
+resource "lxd_storage_volume" "osd" {
   count        = var.nb_osd
   name         = "${var.hostname}_osd${count.index}"
   pool         = "default"
@@ -54,11 +54,6 @@ resource "lxd_instance" "compute" {
   image = "ubuntu:noble"
   type  = "virtual-machine"
 
-  limits = {
-    cpu    = var.cores
-    memory = var.memory
-  }
-
   timeouts = {
     create = var.vm_boot_timeout
     update = var.vm_boot_timeout
@@ -80,6 +75,8 @@ resource "lxd_instance" "compute" {
       search_domains     = jsonencode([var.management_domain])
       nb_extra_nics      = length(var.compute_nets) + length(var.isolation_nets)
     })
+    "limits.cpu"    = var.cores
+    "limits.memory" = var.memory
   }
 
   device {
@@ -127,7 +124,7 @@ resource "lxd_instance" "compute" {
   }
 
   dynamic "device" {
-    for_each = lxd_volume.osd
+    for_each = lxd_storage_volume.osd
     content {
       name = device.value.name
 
